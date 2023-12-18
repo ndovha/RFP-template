@@ -1,0 +1,19 @@
+[debug] [2023-12-11T06:17:31.028Z] ----------------------------------------------------------------------
+[debug] [2023-12-11T06:17:31.042Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\cami2\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init hosting
+[debug] [2023-12-11T06:17:31.045Z] CLI Version:   12.9.1
+[debug] [2023-12-11T06:17:31.053Z] Platform:      win32
+[debug] [2023-12-11T06:17:31.058Z] Node Version:  v18.16.0
+[debug] [2023-12-11T06:17:31.112Z] Time:          Sun Dec 10 2023 23:17:31 GMT-0700 (Mountain Standard Time)
+[debug] [2023-12-11T06:17:31.114Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-11T06:17:31.570Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-11T06:17:31.573Z] > authorizing via signed-in user (camigm1@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+
+
