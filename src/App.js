@@ -62,6 +62,7 @@ function App() {
   const handleDelete = (todo) => {
     remove(ref(db, `/${todo.uuid}`));
   };
+  
   return (
     <div className="App">
       <input type="text" value={todo} onChange={handleTodoChange} />
@@ -82,10 +83,10 @@ function App() {
       {todos.map((todo) => (
         <div
           style={{
-            width: "80%",
+            width: "55%",
             margin: "0 auto",
             border: "2px solid black",
-            height: "700px",
+            height: "500px",
             fontSize: "25px",
           }}
           key={todo.uuid}
