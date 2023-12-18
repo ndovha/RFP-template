@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/ndovha/RFP-template/static/css/main.050965cf.css",
-    "main.js": "/ndovha/RFP-template/static/js/main.f68ce3cc.js",
-    "static/js/787.e88ac3fe.chunk.js": "/ndovha/RFP-template/static/js/787.e88ac3fe.chunk.js",
-    "index.html": "/ndovha/RFP-template/index.html",
-    "main.050965cf.css.map": "/ndovha/RFP-template/static/css/main.050965cf.css.map",
-    "main.f68ce3cc.js.map": "/ndovha/RFP-template/static/js/main.f68ce3cc.js.map",
-    "787.e88ac3fe.chunk.js.map": "/ndovha/RFP-template/static/js/787.e88ac3fe.chunk.js.map"
+    "main.css": "/ndovha/static/css/main.050965cf.css",
+    "main.js": "/ndovha/static/js/main.c2885424.js",
+    "static/js/787.e88ac3fe.chunk.js": "/ndovha/static/js/787.e88ac3fe.chunk.js",
+    "index.html": "/ndovha/index.html",
+    "main.050965cf.css.map": "/ndovha/static/css/main.050965cf.css.map",
+    "main.c2885424.js.map": "/ndovha/static/js/main.c2885424.js.map",
+    "787.e88ac3fe.chunk.js.map": "/ndovha/static/js/787.e88ac3fe.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.050965cf.css",
-    "static/js/main.f68ce3cc.js"
+    "static/js/main.c2885424.js"
   ]
 }
