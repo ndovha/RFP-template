@@ -25,7 +25,7 @@ function App() {
       t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
     );
     setTodos(updatedTodos);
-    window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000');
+    window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
   };
   const handleTodoChange = (e) => {
     setTodo(e.target.value);
