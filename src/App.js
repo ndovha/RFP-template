@@ -25,8 +25,15 @@ function App() {
       t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
     );
     setTodos(updatedTodos);
-    window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
+    const selectedText = window.getSelection().toString();
+    // window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
+    window.parent.postMessage({
+      type: 'contentChange',
+      todos: updatedTodos,
+      selectedText: selectedText,
+    }, 'http://localhost:3000/edit-proposal');
   };
+
   const handleTodoChange = (e) => {
     setTodo(e.target.value);
   };
@@ -38,7 +45,6 @@ const handleMessageFromParent = (event) => {
 
   if (type === 'getSelection') {
     // Handle the received getSelection message
-    // You can perform any specific logic here
     console.log('Received getSelection message from Parent');
   } else if (type === 'undo') {
     // Handle the received undo message
@@ -49,8 +55,13 @@ const handleMessageFromParent = (event) => {
   } else if (type === 'selectedText') {
     // Handle the received selectedText
     console.log('Selected Text from Parent:', value);
-    // You can set it to state or perform any other action as needed
     setTodo(value);
+  } else if (type === 'contentChange') {
+    // Handle the received contentChange
+    // Extract and use the updated content and todos from the message
+    const { todos: updatedTodos, selectedText: updatedSelectedText } = value;
+    setTodos(updatedTodos);
+    setTodo(updatedSelectedText);
   }
 };
 
@@ -62,10 +73,11 @@ return () => {
   window.removeEventListener('message', handleMessageFromParent);
 };
   }, []);
+
   const handleDoubleClick = () => {
     const selectedText = window.getSelection().toString();
     console.log(selectedText)
-    window.parent.postMessage({ type: 'selectedText', value: selectedText }, '*');
+    window.parent.postMessage({ type: 'selectedText', value: selectedText }, 'http://localhost:3000/edit-proposal');
   };
 
 
