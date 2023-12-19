@@ -8,18 +8,7 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [tempUuid, setTempUuid] = useState("");
-  // const handleContentChange = (event, todo) => {
-  //   const updatedTodos = todos.map((t) =>
-  //     t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
-  //   );
-  //   setTodos(updatedTodos);
-  //   // Ensure that the Firebase update logic is here (if it's not happening elsewhere).
-  //   // For example:
-  //   update(ref(db, `/${todo.uuid}`), {
-  //     todo: event.target.innerHTML,
-  //     uuid: todo.uuid,
-  //   });
-  // };
+
   const handleContentChange = (event, todo) => {
     const updatedTodos = todos.map((t) =>
       t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
