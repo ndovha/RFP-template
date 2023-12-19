@@ -8,21 +8,67 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [tempUuid, setTempUuid] = useState("");
+  // const handleContentChange = (event, todo) => {
+  //   const updatedTodos = todos.map((t) =>
+  //     t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
+  //   );
+  //   setTodos(updatedTodos);
+  //   // Ensure that the Firebase update logic is here (if it's not happening elsewhere).
+  //   // For example:
+  //   update(ref(db, `/${todo.uuid}`), {
+  //     todo: event.target.innerHTML,
+  //     uuid: todo.uuid,
+  //   });
+  // };
   const handleContentChange = (event, todo) => {
     const updatedTodos = todos.map((t) =>
       t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
     );
     setTodos(updatedTodos);
-    // Ensure that the Firebase update logic is here (if it's not happening elsewhere).
-    // For example:
-    update(ref(db, `/${todo.uuid}`), {
-      todo: event.target.innerHTML,
-      uuid: todo.uuid,
-    });
+    window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, '*');
   };
   const handleTodoChange = (e) => {
     setTodo(e.target.value);
   };
+
+  useEffect(() => {
+// Add an event listener to handle messages from the parent
+const handleMessageFromParent = (event) => {
+  const { type, value } = event.data;
+
+  if (type === 'getSelection') {
+    // Handle the received getSelection message
+    // You can perform any specific logic here
+    console.log('Received getSelection message from Parent');
+  } else if (type === 'undo') {
+    // Handle the received undo message
+    console.log('Received undo message from Parent');
+  } else if (type === 'redo') {
+    // Handle the received redo message
+    console.log('Received redo message from Parent');
+  } else if (type === 'selectedText') {
+    // Handle the received selectedText
+    console.log('Selected Text from Parent:', value);
+    // You can set it to state or perform any other action as needed
+    setTodo(value);
+  }
+};
+
+// Attach the event listener
+window.addEventListener('message', handleMessageFromParent);
+
+// Clean up the event listener on component unmount
+return () => {
+  window.removeEventListener('message', handleMessageFromParent);
+};
+  }, []);
+  const handleDoubleClick = () => {
+    const selectedText = window.getSelection().toString();
+    console.log(selectedText)
+    window.parent.postMessage({ type: 'selectedText', value: selectedText }, '*');
+  };
+
+
   //read
   useEffect(() => {
     onValue(ref(db), (snapshot) => {
@@ -93,6 +139,7 @@ function App() {
         >
           <div
             contentEditable={true}
+            onDoubleClick={handleDoubleClick}
             dangerouslySetInnerHTML={{ __html: todo.todo }}
             onBlur={(event) => handleContentChange(event, todo)}
           />
