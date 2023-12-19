@@ -13,8 +13,10 @@ function App() {
     const updatedTodos = todos.map((t) =>
       t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
     );
+    console.log('Updated Todos:', updatedTodos);
     setTodos(updatedTodos);
     const selectedText = window.getSelection().toString();
+    console.log('Selected Text:', selectedText);
     // window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
     window.parent.postMessage({
       type: 'contentChange',
