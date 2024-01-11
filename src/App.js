@@ -8,6 +8,7 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [tempUuid, setTempUuid] = useState("");
+  const [visualFeedback, setVisualFeedback] = useState<string>('');
 
   const handleContentChange = (event, todo) => {
     const updatedTodos = todos.map((t) =>
@@ -34,26 +35,45 @@ function App() {
 const handleMessageFromParent = (event) => {
   const { type, value } = event.data;
 
-  if (type === 'getSelection') {
-    // Handle the received getSelection message
-    console.log('Received getSelection message from Parent');
-  } else if (type === 'undo') {
-    // Handle the received undo message
-    console.log('Received undo message from Parent');
-  } else if (type === 'redo') {
-    // Handle the received redo message
-    console.log('Received redo message from Parent');
-  } else if (type === 'selectedText') {
-    // Handle the received selectedText
-    console.log('Selected Text from Parent:', value);
-    setTodo(value);
-  } else if (type === 'contentChange') {
-    // Handle the received contentChange
-    // Extract and use the updated content and todos from the message
-    const { todos: updatedTodos, selectedText: updatedSelectedText } = value;
-    setTodos(updatedTodos);
-    setTodo(updatedSelectedText);
-  }
+    if (type === 'undo') {
+      // Handle undo logic in TemplateApp
+      // Update contenteditable area or perform other undo-related actions
+      console.log('Undo triggered in TemplateApp');
+    } else if (type === 'redo') {
+      // Handle redo logic in TemplateApp
+      // Update contenteditable area or perform other redo-related actions
+      console.log('Redo triggered in TemplateApp');
+    } else if (type === 'contentChange') {
+      // Handle content change in TemplateApp
+      // You can update the contenteditable area or perform other actions
+      const { selectedText } = value;
+      console.log('Content change in TemplateApp:', selectedText);
+    } else if (type === 'visualFeedback') {
+      // Receive visual feedback from ToolbarApp and update UI accordingly
+      setVisualFeedback(value);
+    }
+  // const { type, value } = event.data;
+
+  // if (type === 'getSelection') {
+  //   // Handle the received getSelection message
+  //   console.log('Received getSelection message from Parent');
+  // } else if (type === 'undo') {
+  //   // Handle the received undo message
+  //   console.log('Received undo message from Parent');
+  // } else if (type === 'redo') {
+  //   // Handle the received redo message
+  //   console.log('Received redo message from Parent');
+  // } else if (type === 'selectedText') {
+  //   // Handle the received selectedText
+  //   console.log('Selected Text from Parent:', value);
+  //   setTodo(value);
+  // } else if (type === 'contentChange') {
+  //   // Handle the received contentChange
+  //   // Extract and use the updated content and todos from the message
+  //   const { todos: updatedTodos, selectedText: updatedSelectedText } = value;
+  //   setTodos(updatedTodos);
+  //   setTodo(updatedSelectedText);
+  // }
 };
 
 // Attach the event listener

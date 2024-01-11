@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url('blob:https://www.figma.com/3498dd13-4c3c-41da-90ed-e44140f31696');
+  /* background-image: url('blob:https://www.figma.com/3498dd13-4c3c-41da-90ed-e44140f31696'); */
 }
 
 code {
