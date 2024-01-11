@@ -8,7 +8,7 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [tempUuid, setTempUuid] = useState("");
-  const [visualFeedback, setVisualFeedback] = useState<string>('');
+  const [visualFeedback, setVisualFeedback] = useState('');
 
   const handleContentChange = (event, todo) => {
     const updatedTodos = todos.map((t) =>
