@@ -10,7 +10,7 @@ function App() {
 	const [tempUuid, setTempUuid] = useState('');
 	const [visualFeedback, setVisualFeedback] = useState('');
 
-	const handleContentChange = (newContent) => {
+	const handleContentChange = (event) => {
 		const updatedTodos = todos.map((t) =>
 		  t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
 		);
