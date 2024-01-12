@@ -11,17 +11,17 @@ function App() {
 	const [visualFeedback, setVisualFeedback] = useState('');
 
 	const handleContentChange = (newContent) => {
-		// const updatedTodos = todos.map((t) =>
-		//   t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
-		// );
-		// console.log('Updated Todos:', updatedTodos);
-		// setTodos(updatedTodos);
-		const updatedTodos = setTodos((prevTodos) =>
-			prevTodos.map((todo) =>
-				todo.uuid === todoToUpdateUUID ? { ...todo, todo: newContent } : todo
-			)
+		const updatedTodos = todos.map((t) =>
+		  t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
 		);
 		console.log('Updated Todos:', updatedTodos);
+		setTodos(updatedTodos);
+		// const updatedTodos = setTodos((prevTodos) =>
+		// 	prevTodos.map((todo) =>
+		// 		todo.uuid === todoToUpdateUUID ? { ...todo, todo: newContent } : todo
+		// 	)
+		// );
+		// console.log('Updated Todos:', updatedTodos);
 		const selectedText = window.getSelection().toString();
 		// console.log('Selected Text:', selectedText);
 		// window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
