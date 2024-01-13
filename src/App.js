@@ -2,8 +2,9 @@ import './App.css';
 import { db } from './firebase';
 import { uid } from 'uid';
 import { set, ref, onValue, remove, update } from 'firebase/database';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 function App() {
+  const contentEditableRef = useRef(null);
 	const [todo, setTodo] = useState('');
 	const [todos, setTodos] = useState([]);
 	const [isEdit, setIsEdit] = useState(false);
@@ -194,8 +195,9 @@ const handleRedo = () => {
 				>
 					<div
 						id='editable-content'
+            ref={contentEditableRef}
 						contentEditable={true}
-						onDoubleClick={handleDoubleClick}
+						// onDoubleClick={handleDoubleClick}
 						dangerouslySetInnerHTML={{ __html: todo.todo }}
 						onBlur={(event) => handleContentChange(event, todo)}
 					/>
