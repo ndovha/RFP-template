@@ -41,51 +41,55 @@ function App() {
 		setTodo(e.target.value);
 	};
 
-	// useEffect(() => {
-	// 	// Add an event listener to handle messages from the parent
-	// 	const handleMessageFromParent = (event) => {
-	// 		const { type, value } = event.data;
+	useEffect(() => {
+		// Add an event listener to handle messages from the parent
+		const handleMessageFromParent = (event) => {
+			const { type, value } = event.data;
 
-	// 		if (type === 'undo') {
-	// 			// Handle undo logic in TemplateApp
-	// 			// Update contenteditable area or perform other undo-related actions
-	// 			console.log('Undo triggered in TemplateApp');
-	// 		} else if (type === 'redo') {
-	// 			// Handle redo logic in TemplateApp
-	// 			// Update contenteditable area or perform other redo-related actions
-	// 			console.log('Redo triggered in TemplateApp');
-	// 		} else if (type === 'contentChange') {
-	// 			// Handle content change in TemplateApp
-	// 			// You can update the contenteditable area or perform other actions
-	// 			const { selectedText } = value;
-	// 			console.log('Content change in TemplateApp:', selectedText);
-	// 		} else if (type === 'visualFeedback') {
-	// 			// Receive visual feedback from ToolbarApp and update UI accordingly
-	// 			setVisualFeedback(value);
-	// 		}
+			if (type === 'undo') {
+				// Handle undo logic in TemplateApp
+				// Update contenteditable area or perform other undo-related actions
+				console.log('Undo triggered in TemplateApp');
+        handleUndo();
+			} else if (type === 'redo') {
+				// Handle redo logic in TemplateApp
+				// Update contenteditable area or perform other redo-related actions
+				console.log('Redo triggered in TemplateApp');
+        handleRedo();
+			} else if (type === 'contentChange') {
+				// Handle content change in TemplateApp
+				// You can update the contenteditable area or perform other actions
+				const { selectedText } = value;
+				console.log('Content change in TemplateApp:', selectedText);
+			} else if (type === 'visualFeedback') {
+				// Receive visual feedback from ToolbarApp and update UI accordingly
+				setVisualFeedback(value);
+			}
 
-	// 	};
+		};
   // Event listener to receive messages from the Toolbar app
-window.addEventListener('message', function (event) {
-  const { type, value } = event.data;
+// window.addEventListener('message', function (event) {
+//   const { type, value } = event.data;
 
-  if (type === 'undo') {
-    handleUndo();
-  } else if (type === 'redo') {
-    handleRedo();
-  } else if (type === 'visualFeedback') {
-    // Receive visual feedback from ToolbarApp and update UI accordingly
-  }
-});
+//   if (type === 'undo') {
+//     console.log('Undo triggered in TemplateApp');
+//     handleUndo();
+//   } else if (type === 'redo') {
+//     console.log('Redo triggered in TemplateApp');
+//     handleRedo();
+//   } else if (type === 'visualFeedback') {
+//     // Receive visual feedback from ToolbarApp and update UI accordingly
+//   }
+// });
 
-	// 	// Attach the event listener
-	// 	window.addEventListener('message', handleMessageFromParent);
+		// Attach the event listener
+		window.addEventListener('message', handleMessageFromParent);
 
-	// 	// Clean up the event listener on component unmount
-	// 	return () => {
-	// 		window.removeEventListener('message', handleMessageFromParent);
-	// 	};
-	// }, []);
+		// Clean up the event listener on component unmount
+		return () => {
+			window.removeEventListener('message', handleMessageFromParent);
+		};
+	}, []);
   // Function to handle undo action
 const handleUndo = () => {
   if (contentUndoStack.length > 1) {
