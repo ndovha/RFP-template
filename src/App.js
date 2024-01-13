@@ -94,7 +94,7 @@ const handleUndo = () => {
     contentRedoStack.push(currentState);
 
     // Set the contenteditable area to the previous state
-    contentEditableElement.innerHTML = contentUndoStack[contentUndoStack.length - 1];
+    contentEditableRef.innerHTML = contentUndoStack[contentUndoStack.length - 1];
 
     // Send a message to the Toolbar app indicating the new state
     window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
@@ -109,7 +109,7 @@ const handleRedo = () => {
     contentUndoStack.push(nextState);
 
     // Set the contenteditable area to the next state
-    contentEditableElement.innerHTML = nextState;
+    contentEditableRef.innerHTML = nextState;
 
     // Send a message to the Toolbar app indicating the new state
     window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
