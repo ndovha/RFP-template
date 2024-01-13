@@ -13,7 +13,7 @@ function App() {
 	const [contentUndoStack, setContentUndoStack] = useState([]);
   const [contentRedoStack, setContentRedoStack] = useState([]);
 
-	const handleContentChange = (event, todo) => {
+	const handleContentChange = (event, todo, contentEditableRef) => {
 		// Update contenteditable area
 		const updatedTodos = todos.map((t) =>
 			t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
@@ -46,8 +46,6 @@ const handleUndo = () => {
     // Pop the current state from the undo stack
     const currentState = contentUndoStack.pop();
     setContentRedoStack((prev) => [...prev, currentState]);
-
-    // Set the contenteditable area to the previous state
     contentEditableRef.current.innerHTML = contentUndoStack[contentUndoStack.length - 1];
 
     // Send a message to the Toolbar app indicating the new state
@@ -61,8 +59,6 @@ const handleRedo = () => {
     // Pop the next state from the redo stack
     const nextState = contentRedoStack.pop();
     setContentUndoStack((prev) => [...prev, nextState]);
-
-    // Set the contenteditable area to the next state
     contentEditableRef.current.innerHTML = nextState;
 
     // Send a message to the Toolbar app indicating the new state
@@ -184,7 +180,7 @@ useEffect(() => {
 						contentEditable={true}
 						// onDoubleClick={handleDoubleClick}
 						dangerouslySetInnerHTML={{ __html: todo.todo }}
-						onBlur={(event) => handleContentChange(event, todo)}
+						onBlur={(event) => handleContentChange(event, todo, contentEditableRef)}
 					/>
 					<button onClick={() => handleUpdate(todo)}>update</button>
 					<button onClick={() => handleDelete(todo)}>delete</button>
