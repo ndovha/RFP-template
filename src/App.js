@@ -9,27 +9,28 @@ function App() {
 	const [isEdit, setIsEdit] = useState(false);
 	const [tempUuid, setTempUuid] = useState('');
 	const [visualFeedback, setVisualFeedback] = useState('');
-
-	const handleContentChange = (event) => {
+	// Inside the component where you handle content changes
+	let contentUndoStack = [];
+	let contentRedoStack = [];
+	const handleContentChange = (event, todo) => {
+		// Update contenteditable area
 		const updatedTodos = todos.map((t) =>
-		  t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
+			t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
 		);
-		console.log('Updated Todos:', updatedTodos);
-		setTodos(updatedTodos);
-		// const updatedTodos = setTodos((prevTodos) =>
-		// 	prevTodos.map((todo) =>
-		// 		todo.uuid === todoToUpdateUUID ? { ...todo, todo: newContent } : todo
-		// 	)
-		// );
-		// console.log('Updated Todos:', updatedTodos);
-		const selectedText = window.getSelection().toString();
-		// console.log('Selected Text:', selectedText);
-		// window.parent.postMessage({ type: 'selectedText', value: event.target.innerHTML }, 'http://localhost:3000/edit-proposal');
+
+		// Push the current state to the undo stack
+		contentUndoStack.push(event.target.innerHTML);
+
+		// Clear the redo stack when a new change is made
+		contentRedoStack = [];
+		// Send a message to the Toolbar app with the selected text
 		window.parent.postMessage(
 			{
 				type: 'contentChange',
-				todos: updatedTodos,
-				selectedText: selectedText,
+				value: {
+					todos: updatedTodos,
+					selectedText: window.getSelection().toString(),
+				},
 			},
 			'http://localhost:3000/edit-proposal'
 		);
@@ -39,69 +40,89 @@ function App() {
 		setTodo(e.target.value);
 	};
 
-	useEffect(() => {
-		// Add an event listener to handle messages from the parent
-		const handleMessageFromParent = (event) => {
-			const { type, value } = event.data;
+	// useEffect(() => {
+	// 	// Add an event listener to handle messages from the parent
+	// 	const handleMessageFromParent = (event) => {
+	// 		const { type, value } = event.data;
 
-			if (type === 'undo') {
-				// Handle undo logic in TemplateApp
-				// Update contenteditable area or perform other undo-related actions
-				console.log('Undo triggered in TemplateApp');
-			} else if (type === 'redo') {
-				// Handle redo logic in TemplateApp
-				// Update contenteditable area or perform other redo-related actions
-				console.log('Redo triggered in TemplateApp');
-			} else if (type === 'contentChange') {
-				// Handle content change in TemplateApp
-				// You can update the contenteditable area or perform other actions
-				const { selectedText } = value;
-				console.log('Content change in TemplateApp:', selectedText);
-			} else if (type === 'visualFeedback') {
-				// Receive visual feedback from ToolbarApp and update UI accordingly
-				setVisualFeedback(value);
-			}
-			// const { type, value } = event.data;
+	// 		if (type === 'undo') {
+	// 			// Handle undo logic in TemplateApp
+	// 			// Update contenteditable area or perform other undo-related actions
+	// 			console.log('Undo triggered in TemplateApp');
+	// 		} else if (type === 'redo') {
+	// 			// Handle redo logic in TemplateApp
+	// 			// Update contenteditable area or perform other redo-related actions
+	// 			console.log('Redo triggered in TemplateApp');
+	// 		} else if (type === 'contentChange') {
+	// 			// Handle content change in TemplateApp
+	// 			// You can update the contenteditable area or perform other actions
+	// 			const { selectedText } = value;
+	// 			console.log('Content change in TemplateApp:', selectedText);
+	// 		} else if (type === 'visualFeedback') {
+	// 			// Receive visual feedback from ToolbarApp and update UI accordingly
+	// 			setVisualFeedback(value);
+	// 		}
 
-			// if (type === 'getSelection') {
-			//   // Handle the received getSelection message
-			//   console.log('Received getSelection message from Parent');
-			// } else if (type === 'undo') {
-			//   // Handle the received undo message
-			//   console.log('Received undo message from Parent');
-			// } else if (type === 'redo') {
-			//   // Handle the received redo message
-			//   console.log('Received redo message from Parent');
-			// } else if (type === 'selectedText') {
-			//   // Handle the received selectedText
-			//   console.log('Selected Text from Parent:', value);
-			//   setTodo(value);
-			// } else if (type === 'contentChange') {
-			//   // Handle the received contentChange
-			//   // Extract and use the updated content and todos from the message
-			//   const { todos: updatedTodos, selectedText: updatedSelectedText } = value;
-			//   setTodos(updatedTodos);
-			//   setTodo(updatedSelectedText);
-			// }
-		};
+	// 	};
+  // Event listener to receive messages from the Toolbar app
+window.addEventListener('message', function (event) {
+  const { type, value } = event.data;
 
-		// Attach the event listener
-		window.addEventListener('message', handleMessageFromParent);
+  if (type === 'undo') {
+    handleUndo();
+  } else if (type === 'redo') {
+    handleRedo();
+  } else if (type === 'visualFeedback') {
+    // Receive visual feedback from ToolbarApp and update UI accordingly
+  }
+});
 
-		// Clean up the event listener on component unmount
-		return () => {
-			window.removeEventListener('message', handleMessageFromParent);
-		};
-	}, []);
+	// 	// Attach the event listener
+	// 	window.addEventListener('message', handleMessageFromParent);
 
-	const handleDoubleClick = () => {
-		const selectedText = window.getSelection().toString();
-		console.log(selectedText);
-		window.parent.postMessage(
-			{ type: 'selectedText', value: selectedText },
-			'http://localhost:3000/edit-proposal'
-		);
-	};
+	// 	// Clean up the event listener on component unmount
+	// 	return () => {
+	// 		window.removeEventListener('message', handleMessageFromParent);
+	// 	};
+	// }, []);
+  // Function to handle undo action
+const handleUndo = () => {
+  if (contentUndoStack.length > 1) {
+    // Pop the current state from the undo stack
+    const currentState = contentUndoStack.pop();
+    contentRedoStack.push(currentState);
+
+    // Set the contenteditable area to the previous state
+    contentEditableElement.innerHTML = contentUndoStack[contentUndoStack.length - 1];
+
+    // Send a message to the Toolbar app indicating the new state
+    window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
+  }
+};
+
+// Function to handle redo action
+const handleRedo = () => {
+  if (contentRedoStack.length > 0) {
+    // Pop the next state from the redo stack
+    const nextState = contentRedoStack.pop();
+    contentUndoStack.push(nextState);
+
+    // Set the contenteditable area to the next state
+    contentEditableElement.innerHTML = nextState;
+
+    // Send a message to the Toolbar app indicating the new state
+    window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
+  }
+};
+
+	// const handleDoubleClick = () => {
+	// 	const selectedText = window.getSelection().toString();
+	// 	console.log(selectedText);
+	// 	window.parent.postMessage(
+	// 		{ type: 'selectedText', value: selectedText },
+	// 		'http://localhost:3000/edit-proposal'
+	// 	);
+	// };
 
 	//read
 	useEffect(() => {
@@ -193,7 +214,7 @@ export default App;
 <style>     
   body {       font-family: sans-serif;     }     
   header {       background-color: #CCEEFF;       padding: 1em;       text-align: center;       font-size: 2em;     }     
-  .contact-info {       padding: 1em;   }   </style>    
+  .contact-info {       padding: 1em; background color: white;  }   </style>    
    <header>RFP test</header>   
    <div class="contact-info">     
    <p>Email: example@email.com</p>     
