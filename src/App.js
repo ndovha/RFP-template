@@ -4,26 +4,27 @@ import { uid } from 'uid';
 import { set, ref, onValue, remove, update } from 'firebase/database';
 import { useState, useEffect, useRef } from 'react';
 function App() {
-  const contentEditableRef = useRef(null);
+	const contentEditableRef = useRef(null);
 	const [todo, setTodo] = useState('');
 	const [todos, setTodos] = useState([]);
 	const [isEdit, setIsEdit] = useState(false);
 	const [tempUuid, setTempUuid] = useState('');
 	const [visualFeedback, setVisualFeedback] = useState('');
 	const [contentUndoStack, setContentUndoStack] = useState([]);
-  const [contentRedoStack, setContentRedoStack] = useState([]);
+	const [contentRedoStack, setContentRedoStack] = useState([]);
 
-	const handleContentChange = (event, todo, contentEditableRef) => {
+	const handleContentChange = (event, todo) => {
 		// Update contenteditable area
 		const updatedTodos = todos.map((t) =>
 			t.uuid === todo.uuid ? { ...t, todo: event.target.innerHTML } : t
 		);
-    setTodos(updatedTodos);
-		// Push the current state to the undo stack
-    setContentUndoStack((prev) => [...prev, event.target.innerHTML]);
+		 // Push the current state to the undo stack
+     setContentUndoStack((prev) => [...prev, [...todos]]);
 
-    // Clear the redo stack when a new change is made
-    setContentRedoStack([]);
+     // Clear the redo stack when a new change is made
+     setContentRedoStack([]);
+ 
+     setTodos(updatedTodos);
 		// Send a message to the Toolbar app with the selected text
 		window.parent.postMessage(
 			{
@@ -33,80 +34,93 @@ function App() {
 					selectedText: window.getSelection().toString(),
 				},
 			},
-			'http://localhost:3000/edit-proposal'
+			// 'http://localhost:3000/edit-proposal'
+			'*'
 		);
 	};
 
+	// Function to handle undo action
+  const handleUndo = () => {
+    if (contentUndoStack.length > 1) {
+      const prevTodos = contentUndoStack[contentUndoStack.length - 2];
 
+      setContentUndoStack((prev) => prev.slice(0, -1));
+      setContentRedoStack((prev) => [...prev, [...todos]]);
 
+      setTodos(prevTodos);
 
-  // Function to handle undo action
-const handleUndo = () => {
-  if (contentUndoStack.length > 1) {
-    // Pop the current state from the undo stack
-    const currentState = contentUndoStack.pop();
-    setContentRedoStack((prev) => [...prev, currentState]);
-    contentEditableRef.current.innerHTML = contentUndoStack[contentUndoStack.length - 1];
-
-    // Send a message to the Toolbar app indicating the new state
-    window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
-  }
-};
-
-// Function to handle redo action
-const handleRedo = () => {
-  if (contentRedoStack.length > 0) {
-    // Pop the next state from the redo stack
-    const nextState = contentRedoStack.pop();
-    setContentUndoStack((prev) => [...prev, nextState]);
-    contentEditableRef.current.innerHTML = nextState;
-
-    // Send a message to the Toolbar app indicating the new state
-    window.parent.postMessage({ type: 'contentChange', value: { todos, selectedText: window.getSelection().toString() } }, 'http://localhost:3000/edit-proposal');
-  }
-};
-
-useEffect(() => {
-  // Add an event listener to handle messages from the parent
-  const handleMessageFromParent = (event) => {
-    const { type, value } = event.data;
-
-    if (type === 'undo') {
-      // Handle undo logic in TemplateApp
-      // Update contenteditable area or perform other undo-related actions
-      console.log('Undo triggered in TemplateApp');
-      handleUndo();
-    } else if (type === 'redo') {
-      // Handle redo logic in TemplateApp
-      // Update contenteditable area or perform other redo-related actions
-      console.log('Redo triggered in TemplateApp');
-      handleRedo();
-    } else if (type === 'contentChange') {
-      // Handle content change in TemplateApp
-      // You can update the contenteditable area or perform other actions
-      const { selectedText } = value;
-      console.log('Content change in TemplateApp:', selectedText);
-    } else if (type === 'visualFeedback') {
-      // Receive visual feedback from ToolbarApp and update UI accordingly
-      setVisualFeedback(value);
+      window.parent.postMessage(
+        {
+          type: 'contentChange',
+          value: {
+            todos: prevTodos,
+            selectedText: window.getSelection().toString(),
+          },
+        },
+        '*'
+      );
     }
+  };
+	// Function to handle redo action
+  const handleRedo = () => {
+    if (contentRedoStack.length > 0) {
+      const nextTodos = contentRedoStack[contentRedoStack.length - 1];
 
+      setContentUndoStack((prev) => [...prev, [...todos]]);
+      setContentRedoStack((prev) => prev.slice(0, -1));
+
+      setTodos(nextTodos);
+
+      // Send a message to the Toolbar app indicating the new state
+      window.parent.postMessage(
+        {
+          type: 'contentChange',
+          value: {
+            todos: nextTodos,
+            selectedText: window.getSelection().toString(),
+          },
+        },
+        '*'
+      );
+    }
   };
 
 
-  // Attach the event listener
-  window.addEventListener('message', handleMessageFromParent);
+  useEffect(() => {
+    // Add an event listener to handle messages from the parent
+    const handleMessageFromParent = (event) => {
+      const { type, value } = event.data;
 
-  // Clean up the event listener on component unmount
-  return () => {
-    window.removeEventListener('message', handleMessageFromParent);
-  };
-}, [todos]);
+      if (type === 'undo') {
+        console.log('Undo triggered in TemplateApp');
+        handleUndo();
+      } else if (type === 'redo') {
+        console.log('Redo triggered in TemplateApp');
+        handleRedo();
+      } else if (type === 'contentChange') {
+        const { todos: updatedTodos, selectedText } = value;
+        setTodos(updatedTodos);
+        contentEditableRef.current.innerHTML =
+          updatedTodos[updatedTodos.length - 1][0]?.todo || '';
+        console.log('Content change in TemplateApp:', selectedText);
+      } else if (type === 'visualFeedback') {
+        setVisualFeedback(value);
+      }
+    };
+
+    setContentUndoStack([todos]);
+
+    window.addEventListener('message', handleMessageFromParent);
+    return () => {
+      window.removeEventListener('message', handleMessageFromParent);
+    };
+  }, [todos]);
 
 	const handleTodoChange = (e) => {
 		setTodo(e.target.value);
 	};
-	//read
+
+	//read Firabase
 	useEffect(() => {
 		onValue(ref(db), (snapshot) => {
 			setTodos([]);
@@ -118,7 +132,7 @@ useEffect(() => {
 			}
 		});
 	}, []);
-	//write
+	//write Firabase
 	const writeToDatabase = () => {
 		const uuid = uid();
 		set(ref(db, `/${uuid}`), {
@@ -127,7 +141,7 @@ useEffect(() => {
 		});
 		setTodo('');
 	};
-	//update
+	//update Firabase
 	const handleUpdate = (todo) => {
 		setIsEdit(true);
 		setTempUuid(todo.uuid);
@@ -141,7 +155,7 @@ useEffect(() => {
 		setTodo('');
 		setIsEdit(false);
 	};
-	//delete
+	//delete 
 	const handleDelete = (todo) => {
 		remove(ref(db, `/${todo.uuid}`));
 	};
@@ -150,19 +164,20 @@ useEffect(() => {
 		<div className='App'>
 			<input type='text' value={todo} onChange={handleTodoChange} />
 			{isEdit ? (
-        <>
-          <button onClick={handleSubmitChange}>Submit Change</button>
-          <button
-            onClick={() => {
-              setIsEdit(false);
-              setTodo("");
-            }}
-          >
-            X
-          </button>
-        </>
-      ) : 
-			<button onClick={writeToDatabase}>submit</button>}
+				<>
+					<button onClick={handleSubmitChange}>Submit Change</button>
+					<button
+						onClick={() => {
+							setIsEdit(false);
+							setTodo('');
+						}}
+					>
+						X
+					</button>
+				</>
+			) : (
+				<button onClick={writeToDatabase}>submit</button>
+			)}
 			{todos.map((todo) => (
 				<div
 					style={{
@@ -176,11 +191,10 @@ useEffect(() => {
 				>
 					<div
 						id='editable-content'
-            ref={contentEditableRef}
+						ref={contentEditableRef}
 						contentEditable={true}
-						// onDoubleClick={handleDoubleClick}
 						dangerouslySetInnerHTML={{ __html: todo.todo }}
-						onBlur={(event) => handleContentChange(event, todo, contentEditableRef)}
+						onBlur={(event) => handleContentChange(event, todo)}
 					/>
 					<button onClick={() => handleUpdate(todo)}>update</button>
 					<button onClick={() => handleDelete(todo)}>delete</button>
