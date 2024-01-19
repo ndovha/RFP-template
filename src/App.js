@@ -3,6 +3,8 @@ import { db } from './firebase';
 import { uid } from 'uid';
 import { set, ref, onValue, remove, update } from 'firebase/database';
 import { useState, useEffect, useRef } from 'react';
+import { useTemplateContext } from './utils/TemplateContext';
+
 function App() {
 	const contentEditableRef = useRef(null);
 	const [todo, setTodo] = useState('');
@@ -12,6 +14,21 @@ function App() {
 	const [visualFeedback, setVisualFeedback] = useState('');
 	const [contentUndoStack, setContentUndoStack] = useState([]);
 	const [contentRedoStack, setContentRedoStack] = useState([]);
+  const { updateSelectedText, updateTodos } = useTemplateContext();
+
+  useEffect(() => {
+    const handleTextSelection = () => {
+      const selectedText = window.getSelection().toString();
+      console.log(selectedText)
+      updateSelectedText(selectedText);
+    };
+
+    document.addEventListener('mouseup', handleTextSelection);
+
+    return () => {
+      document.removeEventListener('mouseup', handleTextSelection);
+    };
+  }, [updateSelectedText]);
 
 	const handleContentChange = (event, todo) => {
 		// Update contenteditable area
